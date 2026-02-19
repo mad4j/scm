@@ -1,0 +1,77 @@
+name: Feature Request
+description: Suggest a new feature for SCM
+title: "[FEATURE] "
+labels: ["type:feature", "status:planned"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature for SCM! Please provide as much detail as possible.
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clear description of the feature
+      placeholder: What feature would you like to see?
+    validations:
+      required: true
+  
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why is this feature needed? What problem does it solve?
+      placeholder: Explain the use case and motivation
+    validations:
+      required: true
+  
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: What conditions must be met for this feature to be complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: false
+  
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical Details
+      description: Implementation notes, API design, etc.
+      placeholder: Technical considerations and implementation ideas
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component does this feature relate to?
+      options:
+        - Core Protocol (scm-core)
+        - Device Implementation (scm-device)
+        - Controller Implementation (scm-controller)
+        - Documentation
+        - Examples/Tools
+        - Testing
+        - Other
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: false
