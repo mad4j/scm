@@ -37,14 +37,14 @@ scm/
 
 ### 1. Protocol Specification (`docs/protocol/`)
 
-Complete protocol specification including:
-- Message frame structure
-- Message types and semantics
-- Communication flows
-- Error handling
-- Transport layer abstraction
+RFC-style specification document (SCM-SPEC-001) covering:
+- Operational environment: Frontend (HMI/View) and Backend (apparatus) components
+- Four commands: `configure`, `query`, `execute` (Frontend → Backend) and `notify` (Backend → Frontend)
+- Message encoding via Protocol Buffers over WebSocket
+- Dispatcher component and its API (Rust on Frontend, Rust or C/C++ on Backend)
 
 📖 [Read the Protocol Specification](docs/protocol/specification.md)
+📄 [Protocol Buffer Definitions](docs/protocol/scm.proto)
 
 ### 2. Software Architecture (`docs/architecture/`)
 
@@ -170,7 +170,8 @@ The project is organized into 8 main epics:
 
 ## Documentation
 
-- [Protocol Specification](docs/protocol/specification.md) - Complete protocol definition
+- [Protocol Specification](docs/protocol/specification.md) - SCM-SPEC-001 (RFC-style, Draft)
+- [Protocol Buffer Definitions](docs/protocol/scm.proto) - Proto3 message stubs
 - [Software Architecture](docs/architecture/software-components.md) - Component design
 - [Issue Hierarchy](docs/issues/issue-hierarchy.md) - Project planning and tracking
 - [API Documentation](https://docs.rs/scm-core) - Generated API docs (coming soon)

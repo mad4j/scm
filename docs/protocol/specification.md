@@ -1,182 +1,213 @@
 # SCM Protocol Specification
 
-## Simple Communication Middleware Protocol v1.0
+**Document Identifier**: SCM-SPEC-001
+**Version**: 1.0
+**Status**: Draft
 
-### 1. Overview
+---
 
-The SCM (Simple Communication Middleware) protocol defines a lightweight, bidirectional communication protocol between devices and control nodes implementing Human-Machine Interface (HMI) functionality.
+## Status of This Memo
 
-### 2. Protocol Goals
+This document specifies the Simple Communication Middleware (SCM) protocol.
+Distribution is unlimited.
 
-- **Simplicity**: Easy to implement on resource-constrained devices
-- **Reliability**: Built-in acknowledgment and error handling
-- **Flexibility**: Extensible message format for various device types
-- **Efficiency**: Minimal overhead for real-time communication
+---
 
-### 3. Architecture
+## Abstract
 
-```
-┌─────────────┐          SCM Protocol          ┌──────────────────┐
-│   Device    │ ◄─────────────────────────────► │ Control Node/HMI │
-│  (Embedded) │                                 │                  │
-└─────────────┘                                 └──────────────────┘
-```
+This document specifies the Simple Communication Middleware (SCM) protocol, a
+bidirectional Remote Procedure Call (RPC) protocol designed for communication
+between a Frontend component implementing a Human-Machine Interface (HMI) and a
+Backend component representing a generic apparatus.  The protocol defines four
+command types: `configure`, `query`, and `execute` (initiated by the Frontend)
+and `notify` (initiated by the Backend).  Messages are encoded using Protocol
+Buffers and transmitted over a WebSocket connection.  The document also
+specifies the Dispatcher component and its API for both Frontend and Backend
+implementations.
 
-### 4. Message Format
+---
 
-#### 4.1 Frame Structure
+## Table of Contents
 
-All messages follow this structure:
+1. [Introduction](#1-introduction)
+2. [Terminology](#2-terminology)
+3. [Operational Environment](#3-operational-environment)
+4. [Protocol Overview](#4-protocol-overview)
+5. [Message Encoding](#5-message-encoding)
+6. [Transport Layer](#6-transport-layer)
+7. [Commands](#7-commands)
+   - 7.1 [configure](#71-configure)
+   - 7.2 [query](#72-query)
+   - 7.3 [execute](#73-execute)
+   - 7.4 [notify](#74-notify)
+8. [Dispatcher Component](#8-dispatcher-component)
+   - 8.1 [Overview](#81-overview)
+   - 8.2 [Frontend Dispatcher API](#82-frontend-dispatcher-api)
+   - 8.3 [Backend Dispatcher API](#83-backend-dispatcher-api)
+9. [Error Handling](#9-error-handling)
+10. [Security Considerations](#10-security-considerations)
+11. [Requirements Summary](#11-requirements-summary)
+12. [References](#12-references)
 
-```
-┌──────┬──────┬─────────┬─────────┬─────────┬──────────┐
-│ STX  │ LEN  │  TYPE   │   ID    │ PAYLOAD │   CRC    │
-├──────┼──────┼─────────┼─────────┼─────────┼──────────┤
-│ 1B   │ 2B   │   1B    │   2B    │  N bytes│   2B     │
-└──────┴──────┴─────────┴─────────┴─────────┴──────────┘
-```
+---
 
-- **STX** (Start of Text): 0x02 - Frame delimiter
-- **LEN**: 16-bit length of entire frame (including STX and CRC)
-- **TYPE**: Message type identifier
-- **ID**: Message/sequence identifier for acknowledgment
-- **PAYLOAD**: Variable-length message data
-- **CRC**: 16-bit CRC-16/CCITT checksum
+## 1. Introduction
 
-#### 4.2 Message Types
+> _To be defined._
 
-| Type | Code | Description | Direction |
-|------|------|-------------|-----------|
-| PING | 0x01 | Keep-alive message | Bidirectional |
-| PONG | 0x02 | Response to PING | Bidirectional |
-| DATA | 0x10 | Data transfer | Bidirectional |
-| CMD  | 0x11 | Command message | Controller → Device |
-| ACK  | 0x20 | Acknowledgment | Bidirectional |
-| NACK | 0x21 | Negative acknowledgment | Bidirectional |
-| ERR  | 0xFF | Error message | Bidirectional |
+---
 
-### 5. Communication Flow
+## 2. Terminology
 
-#### 5.1 Connection Establishment
+> _To be defined._
 
-```
-Device                           Controller
-  │                                  │
-  │◄─────────── PING ────────────────│
-  │                                  │
-  │──────────── PONG ───────────────►│
-  │                                  │
-```
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 \[RFC2119\] \[RFC8174\].
 
-#### 5.2 Data Transfer with Acknowledgment
+---
 
-```
-Device                           Controller
-  │                                  │
-  │──────────── DATA ───────────────►│
-  │                                  │
-  │◄─────────── ACK ─────────────────│
-  │                                  │
-```
+## 3. Operational Environment
 
-#### 5.3 Command Execution
+> _To be defined._
 
-```
-Device                           Controller
-  │                                  │
-  │◄─────────── CMD ─────────────────│
-  │                                  │
-  │──────────── ACK ────────────────►│
-  │                                  │
-  │──────────── DATA ───────────────►│
-  │         (result)                 │
-```
+### 3.1 System Components
 
-### 6. Payload Formats
+> _To be defined._
 
-#### 6.1 DATA Payload
+### 3.2 Frontend Component
 
-```json
-{
-  "timestamp": <unix_timestamp>,
-  "sensor_id": <string>,
-  "value": <number>,
-  "unit": <string>
-}
-```
+> _To be defined._
 
-#### 6.2 CMD Payload
+### 3.3 Backend Component
 
-```json
-{
-  "command": <string>,
-  "parameters": {
-    "key": "value"
-  }
-}
-```
+> _To be defined._
 
-#### 6.3 ERR Payload
+---
 
-```json
-{
-  "error_code": <number>,
-  "message": <string>
-}
-```
+## 4. Protocol Overview
 
-### 7. Error Handling
+> _To be defined._
 
-#### 7.1 Error Codes
+### 4.1 Communication Model
 
-| Code | Description |
-|------|-------------|
-| 0x01 | Invalid message format |
-| 0x02 | CRC checksum mismatch |
-| 0x03 | Unsupported message type |
-| 0x04 | Timeout |
-| 0x05 | Device not ready |
-| 0x10 | Command execution failed |
+> _To be defined._
 
-#### 7.2 Retry Mechanism
+### 4.2 Command Summary
 
-- Maximum retries: 3
-- Timeout: 5 seconds per attempt
-- Exponential backoff: 1s, 2s, 4s
+> _To be defined._
 
-### 8. Transport Layer
+### 4.3 Request Correlation
 
-The protocol is transport-agnostic and can run over:
+> _To be defined._
 
-- UART/Serial
-- TCP/IP
-- UDP
-- CAN bus
-- USB
+---
 
-### 9. Security Considerations
+## 5. Message Encoding
 
-- Optional message encryption (AES-128)
-- Authentication via challenge-response
-- Message sequence validation to prevent replay attacks
+> _To be defined._
 
-### 10. Implementation Requirements
+### 5.1 Protocol Buffers
 
-#### 10.1 Minimum Requirements
+> _To be defined._
 
-- CRC-16/CCITT implementation
-- Message framing/deframing
-- Basic error handling
+### 5.2 Message Envelope
 
-#### 10.2 Recommended Features
+> _To be defined._
 
-- Message queuing
-- Automatic reconnection
-- Statistics/diagnostics
+---
 
-### 11. Future Extensions
+## 6. Transport Layer
 
-- Protocol version negotiation
-- Multi-device support
-- Broadcast messages
-- Priority-based message queuing
+> _To be defined._
+
+### 6.1 WebSocket
+
+> _To be defined._
+
+### 6.2 Connection Management
+
+> _To be defined._
+
+### 6.3 WebSocket URL
+
+> _To be defined._
+
+### 6.4 Message Framing
+
+> _To be defined._
+
+---
+
+## 7. Commands
+
+> _To be defined._
+
+### 7.1 configure
+
+> _To be defined._
+
+### 7.2 query
+
+> _To be defined._
+
+### 7.3 execute
+
+> _To be defined._
+
+### 7.4 notify
+
+> _To be defined._
+
+---
+
+## 8. Dispatcher Component
+
+> _To be defined._
+
+### 8.1 Overview
+
+> _To be defined._
+
+### 8.2 Frontend Dispatcher API
+
+> _To be defined._
+
+### 8.3 Backend Dispatcher API
+
+> _To be defined._
+
+---
+
+## 9. Error Handling
+
+> _To be defined._
+
+---
+
+## 10. Security Considerations
+
+> _To be defined._
+
+---
+
+## 11. Requirements Summary
+
+> _To be defined._
+
+---
+
+## 12. References
+
+- \[RFC2119\] Bradner, S., "Key words for use in RFCs to Indicate Requirement
+  Levels", BCP 14, RFC 2119, March 1997.
+- \[RFC8174\] Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key
+  Words", BCP 14, RFC 8174, May 2017.
+- \[RFC6455\] Fette, I. and A. Melnikov, "The WebSocket Protocol", RFC 6455,
+  December 2011.
+- \[PROTOBUF\] Google LLC, "Protocol Buffers Language Guide (proto3)",
+  https://protobuf.dev/programming-guides/proto3/
+
+---
+
+_Document ID: SCM-SPEC-001 | Version: 1.0 | Status: Draft_

@@ -1,0 +1,39 @@
+// SCM Protocol — Protocol Buffer Definitions
+// Document ID : SCM-SPEC-001
+// Version     : 1.0
+// Status      : Draft
+//
+// NOTE: Message definitions are placeholders.
+//       Detailed field specifications will be added once the
+//       corresponding specification sections have been reviewed.
+
+syntax = "proto3";
+
+package scm.v1;
+
+// ─── Requests (Frontend → Backend) ─────────────────────────────────────────
+
+// To be defined — see specification Section 7.1
+message ConfigureRequest {}
+
+// To be defined — see specification Section 7.2
+message QueryRequest {}
+
+// To be defined — see specification Section 7.3
+message ExecuteRequest {}
+
+// ─── Responses (Backend → Frontend) ────────────────────────────────────────
+
+// To be defined — see specification Section 7.1
+message ConfigureResponse {}
+
+// To be defined — see specification Section 7.2
+message QueryResponse {}
+
+// To be defined — see specification Section 7.3
+message ExecuteResponse {}
+
+// ─── Notifications (Backend → Frontend) ────────────────────────────────────
+
+// To be defined — see specification Section 7.4
+message NotifyMessage {}
