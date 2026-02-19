@@ -1,0 +1,64 @@
+name: Epic
+description: Create a new epic for tracking related issues
+title: "[EPIC] "
+labels: ["type:epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to create a new epic for tracking related issues.
+  
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What is the overall goal of this epic?
+      placeholder: High-level goal description
+    validations:
+      required: true
+  
+  - type: textarea
+    id: issues
+    attributes:
+      label: Issues
+      description: List of issues in this epic
+      placeholder: |
+        - [ ] Issue 1
+        - [ ] Issue 2
+        - [ ] Issue 3
+    validations:
+      required: true
+  
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      description: What will be delivered when this epic is complete?
+      placeholder: |
+        - Deliverable 1
+        - Deliverable 2
+    validations:
+      required: true
+  
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: What other epics or issues must be completed first?
+      placeholder: List dependencies
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Which milestone does this epic belong to?
+      options:
+        - "Milestone 1: Foundation"
+        - "Milestone 2: Core Implementation"
+        - "Milestone 3: Device & Controller"
+        - "Milestone 4: Integration & Testing"
+        - "Milestone 5: Documentation & Release"
+    validations:
+      required: false
