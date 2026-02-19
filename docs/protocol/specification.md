@@ -69,19 +69,126 @@ document are to be interpreted as described in BCP 14 \[RFC2119\] \[RFC8174\].
 
 ## 3. Operational Environment
 
-> _To be defined._
+The SCM protocol is designed for use in distributed systems composed of two
+logically distinct components: a **Frontend Component** and a **Backend
+Component**.  These two components are deployed independently and communicate
+exclusively through SCM messages carried over a WebSocket connection.
+
+The architecture follows the **Model-View-Controller (MVC)** design pattern:
+
+- The Frontend Component implements the **View** layer, providing the
+  Human-Machine Interface (HMI) that an operator uses to observe and control
+  the system.
+- The Backend Component implements the **Controller** and **Model** layers,
+  encapsulating the business logic and the state of the controlled apparatus.
+
+The strict separation between the two components means that neither component
+makes assumptions about the internal implementation of the other; all
+interaction is governed solely by the message contract defined in this
+specification.
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                    Frontend Component                         │
+│                   (View — MVC Pattern)                        │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────────┐  │
+│  │  Human-Machine Interface (HMI)                          │  │
+│  │  - Renders system state to the operator                 │  │
+│  │  - Captures operator input (commands / configuration)   │  │
+│  └───────────────────────┬─────────────────────────────────┘  │
+│                          │  SCM Frontend Dispatcher API        │
+│  ┌───────────────────────┴─────────────────────────────────┐  │
+│  │  SCM Dispatcher (Frontend)                              │  │
+│  └───────────────────────┬─────────────────────────────────┘  │
+└─────────────────────────-┼────────────────────────────────────┘
+                           │  WebSocket (SCM Protocol)
+┌──────────────────────────┼────────────────────────────────────┐
+│  ┌───────────────────────┴─────────────────────────────────┐  │
+│  │  SCM Dispatcher (Backend)                               │  │
+│  └───────────────────────┬─────────────────────────────────┘  │
+│                          │  SCM Backend Dispatcher API         │
+│  ┌───────────────────────┴─────────────────────────────────┐  │
+│  │  Controller Layer                                       │  │
+│  │  - Receives and validates requests from the Frontend    │  │
+│  │  - Executes commands on the apparatus                   │  │
+│  │  - Emits unsolicited notifications to the Frontend      │  │
+│  └───────────────────────┬─────────────────────────────────┘  │
+│                          │                                     │
+│  ┌───────────────────────┴─────────────────────────────────┐  │
+│  │  Model Layer                                            │  │
+│  │  - Represents the state of the controlled apparatus     │  │
+│  │  - Exposes apparatus parameters for query/configuration │  │
+│  └─────────────────────────────────────────────────────────┘  │
+│                    Backend Component                          │
+│             (Controller + Model — MVC Pattern)                │
+└───────────────────────────────────────────────────────────────┘
+```
 
 ### 3.1 System Components
 
-> _To be defined._
+An SCM deployment consists of exactly two components connected by a single
+WebSocket session:
+
+| Component | MVC Role | Initiates | Receives |
+|-----------|----------|-----------|---------|
+| Frontend  | View | `configure`, `query`, `execute` | `notify`, responses |
+| Backend   | Controller + Model | `notify` | `configure`, `query`, `execute` |
+
+The Frontend is the **WebSocket client**; it opens the connection to the
+Backend.  The Backend is the **WebSocket server**; it listens for incoming
+connections and accepts exactly one Frontend session at a time (a Backend MAY
+support multiple concurrent Frontend sessions depending on the deployment
+scenario, but this specification does not require it).
+
+All messages exchanged between the two components MUST conform to the encoding
+rules defined in Section 5 and MUST be transported over the WebSocket
+connection as specified in Section 6.
 
 ### 3.2 Frontend Component
 
-> _To be defined._
+The Frontend Component implements the **View** layer of the MVC pattern.  Its
+primary responsibility is to present the current state of the apparatus to a
+human operator and to relay operator actions to the Backend Component.
+
+The Frontend Component:
+
+- MUST establish the WebSocket connection to the Backend Component before
+  sending any SCM messages.
+- MUST use the SCM Dispatcher Frontend API (Section 8.2) as the sole interface
+  for sending requests and receiving responses or notifications.
+- MUST NOT implement business logic related to apparatus control; it SHALL
+  delegate all such logic to the Backend Component by issuing `configure`,
+  `query`, or `execute` requests.
+- SHOULD maintain a local representation of the apparatus state, updated by
+  the responses received from the Backend Component and by unsolicited
+  `notify` messages.
+- MAY be implemented as a web application, a desktop application, a mobile
+  application, or any other software capable of establishing a WebSocket
+  connection.
 
 ### 3.3 Backend Component
 
-> _To be defined._
+The Backend Component implements both the **Controller** and the **Model**
+layers of the MVC pattern.  It is authoritative over the state of the
+apparatus and is responsible for executing all control actions.
+
+The Backend Component:
+
+- MUST expose a WebSocket server endpoint that the Frontend Component can
+  connect to, as specified in Section 6.3.
+- MUST use the SCM Dispatcher Backend API (Section 8.3) as the sole interface
+  for receiving requests and sending responses or notifications.
+- MUST implement handlers for all request types it intends to support
+  (`configure`, `query`, `execute`) and MUST respond to each request with the
+  corresponding response message.
+- MAY emit unsolicited `notify` messages at any time to inform the Frontend
+  Component of state changes that were not triggered by a Frontend request
+  (e.g., alarms, sensor readings, or autonomous state transitions).
+- MUST NOT initiate `configure`, `query`, or `execute` requests; those message
+  types are reserved for use by the Frontend Component.
+- MAY be implemented as an embedded application, a server-side process, a
+  microservice, or any other software capable of hosting a WebSocket server.
 
 ---
 
